@@ -1,0 +1,6 @@
+.env            # Estä .env-tiedoston lisääminen
+.env.*          # Estä kaikki .env-alkuiset tiedostot (paitsi .env.example)
+__pycache__/    # Estä Pythonin välimuistit
+*.pyc           # Estä kompiloitu Python-koodi
+venv/           # Estä virtuaaliympäristöt
+.DS_Store       # macOS-järjestelmätiedosto
