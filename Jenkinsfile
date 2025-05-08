@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        OWM_API_KEY = credentials('owm-api-key')  # OpenWeatherMap-avain Jenkinsin salaisuutena
+        OWM_API_KEY = credentials('owm-api-key') 
     }
 
     stages {
