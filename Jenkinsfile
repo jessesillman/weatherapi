@@ -2,33 +2,41 @@ pipeline {
     agent any
 
     environment {
-        OWM_API_KEY = credentials('owm-api-key')
+        OWM_API_KEY = credentials('owm-api-key')  # OpenWeatherMap-avain Jenkinsin salaisuutena
     }
 
     stages {
+        stage('Checkout koodi') {
+            steps {
+                git branch: 'main', 
+                    url: 'https://github.com/jessesillman/weatherapi.git'
+            }
+        }
+
+        stage('Luo virtuaaliympäristö') {
+            steps {
+                sh 'python -m venv venv'
+            }
+        }
+
+        stage('Asenna riippuvuudet') {
+            steps {
+                sh 'source venv/bin/activate && pip install -r requirements.txt'
+            }
+        }
+
         stage('Testaa') {
             steps {
-                sh 'pip install pytest'
-                sh 'python -m pytest tests/ -v'
+                sh 'source venv/bin/activate && python -m pytest tests/ -v'
             }
         }
-        
-        stage('Rakenna Docker-image') {
-            steps {
-                script {
-                    docker.build("saa-sovellus:${env.BUILD_ID}")
-                }
-            }
-        }
-        
-        stage('Pushaa Docker Hubiin') {
-            steps {
-                script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker-hub-creds') {
-                        docker.image("saa-sovellus:${env.BUILD_ID}").push("latest")
-                    }
-                }
-            }
+    }
+
+    post {
+        failure {
+            slackSend channel: '#alerts', 
+                     color: 'danger', 
+                     message: "Build ${env.BUILD_URL} epäonnistui!"
         }
     }
 }
